@@ -22,6 +22,25 @@
     </div>
 
     <script>
-        // ...
+        (function ($) {  // função auto-invocada -> já que é um plugin, para garantir que o $ será jQuery, caso alguém tenha usado o $ com outro propósito, como const $ = { nome: 'Não é o jQuery' }
+            $.fn.interpretar = function(){
+                const retirarChaves = s => s.substring(2, s.length - 2)  //retira os dois primeiros caracteres, e os dois últimos, que seriam as chaves
+                const conteudo = $(this).html()
+                const expressoesComChaves = conteudo.match(/\{\{.+\}\}/g)
+                const expressoes = expressoesComChaves.map(retirarChaves)
+                const resultados = expressoes.map(e => eval(e))
+
+                let conteudoFinal = conteudo
+                for(let i = 0; i < expressoesComChaves.length; i++){
+                    conteudoFinal = conteudoFinal.replace(
+                        expressoesComChaves[i], resultados[i]
+                    )
+                }
+                $(this).html(conteudoFinal)
+                return this
+            }
+        })(jQuery)
+
+        $('div').interpretar()
     </script>
 </body>

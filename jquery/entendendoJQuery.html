@@ -14,6 +14,17 @@
     <div>2</div>
 
     <script>
-        // ...
+        $('div').hide(5000).show(5000).fadeOut(1000) //chaining - encadeamento
+        console.log($('div').get(0))
+        console.log($.isEmptyObject({ nome: null}))
+        console.log(jQuery.inArray(3, [1,2,3])) //jQuery == $
+
+        $.fn.fundoVerde = function (){
+            this.css('background-color', 'green')
+            return this //com isso, consegue-se encadear chamadas posteriormente
+        }
+
+        // $('body').fundoVerde().hide(1000)
+        $('body').fundoVerde().fadeOut(1000)
     </script>
 </body>
