@@ -1,9 +1,11 @@
 import $ from "jquery"
 
+import { onLoadHtmlSuccess } from '../core/includes'
+
 const duration = 600
 
 function filterByCity(city){
-    $(['wm-city']).each(function(i, e){
+    $('[wm-city]').each(function(i, e){
         const isTarget = $(this).attr('wm-city') === city || city === null
         if(isTarget){
             $(this).parent().removeClass('d-none') //vai reorganizar as grids
@@ -31,7 +33,6 @@ $.fn.cityButtons = function(){
 
     const btnAll = $('<button>').addClass(['btn', 'btn-info', 'active']).html('Todas')
     btnAll.click(e => filterByCity(null))
-
     btns.push(btnAll)
 
     const btnGroup = $('<div>').addClass(['btn-group'])
@@ -41,4 +42,7 @@ $.fn.cityButtons = function(){
     return this
 }
 
-$('[wm-city-buttons]').cityButtons()
+onLoadHtmlSuccess(function(){
+    $('[wm-city-buttons]').cityButtons()
+})
+
