@@ -1,0 +1,29 @@
+{
+  "users": [
+    {
+      "id": 2,
+      "name": "Mia Tavares",
+      "email": "mia@email"
+    },
+    {
+      "name": "Peri",
+      "email": "peri@email",
+      "id": 3
+    },
+    {
+      "name": "Dolacy",
+      "email": "dora@email",
+      "id": 4
+    },
+    {
+      "user": {
+        "name": "",
+        "email": ""
+      },
+      "list": [],
+      "name": "Giselle Tavares",
+      "email": "gi@email",
+      "id": 5
+    }
+  ]
+}
