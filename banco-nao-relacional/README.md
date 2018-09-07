@@ -110,4 +110,91 @@ OU
 /* para exibir atributos de outros niveis, segu exemplo */
 > db.nomedacollection.find({sigla: "SP"}, {"cidades.nome": 1, _id: 0})
 
->.... só um teste
+/* aggregation pipeline stages */
+/* db.nomedacollection.aggregate([{<stage>, ...}]) 
+Example: o $project vai determinar quais são os atributos que você quer que sejam passados para o próximo passo do pipeline de agregação */
+> db.estados.aggregate([
+    { $project: {nome: 1, "cidade.nome": 1, _id: 0 }}
+])
+
+/* Example 2: ao utilizar o "cidades.populacao" do lado direito, ou seja, como resultado de $sum, é necessário ter o $ na frente do "cidades.populacao", porque assim o compilador sabe que tem que interpolar esses valores para ser colocado em $sum*/
+> db.estados.aggregate([
+    {$project: {populacao: {$sum: "$cidades.populacao"}, sigla: 1, _id: 0}}
+])
+/* no exemplo acima, ele vai trazer o total da populacao por estado */
+
+> db.estados.aggregate([
+    {$project: {populacao: {$sum: "$cidades.populacao"}, sigla: 1, _id: 0}},
+    {$group: {_id: null, populacaoTotal: {$sum: "$populacao"}}}
+])
+/* no exemplo acima, ele vai trazer o total da populacao geral. Neste caso ele vai trazer o atributo "id" com o valor 0 */
+
+> db.estados.aggregate([
+    {$project: {populacao: {$sum: "$cidades.populacao"}, sigla: 1, _id: 0}},
+    {$group: {_id: null, populacaoTotal: {$sum: "$populacao"}}},
+    {$project: { _id: 0, populacaoTotal: 1}}
+])
+/* no exemplo acima, ele vai trazer o total da populacao geral. Neste caso ele NÃO vai trazer o atributo */
+
+/* usando o $match 
+Exemplo: para trazer o estado que tem a cidade Sorocaba */
+> db.estados.aggregate([
+    { $match: {"cidades.nome": "Sorocaba"}}
+]).pretty()
+/* neste exemplo, ele vai trazer todas as informações o estado que deu o match */
+
+> db.estados.aggregate([
+    { $match: {"cidades.nome": "Sorocaba"}},
+    { $unwind: "$cidades"}
+]).pretty()
+/* neste exemplo, ele vai trazer todas as informações o estado que deu o match, porém, com o uso do #unwind, ele vai trazer a quantidade de cidades do estado em documentos separados por cidade.  */
+
+> db.estados.aggregate([
+    { $match: {"cidades.nome": "Sorocaba"}},
+    { $unwind: "$cidades"},
+    { $match: {"cidades.nome": "Sorocaba"}}
+]).pretty()
+/* neste exemplo, ele vai trazer todas as informações o estado, porém no quedito cidade, ele vai trazer só Sorocaba.  */
+
+> db.estados.aggregate([
+    { $match: {"cidades.nome": "Sorocaba"}},
+    { $unwind: "$cidades"},
+    { $match: {"cidades.nome": "Sorocaba"}},
+    { $project: {_id: "$cidades._id"}}
+]).pretty()
+/* neste exemplo, ele vai trazer somente o ID da cidade Sorocaba */
+
+/* usando o $exists */
+/* Exemplo: vai trazer todos os estados que tem o atributo populacao, e exibir apenas o nome */
+> db.estados.find({populacao: {$exists: true}}, {_id: 0, nome: 1})
+
+/* UPDATE */
+/* Exemplo: ele vai alterar a populacao apenas do estado SP */
+> db.estados.update({ sigla: "SP"}, {$set: {populacao: 45340000}})
+
+/* Exemplo 2: */
+> db.estados.update({sigla: "AL"}, {$set: {cidades: [{nome: "Sergipe"}]}})
+/* no exemplo acima, considere que AL não tem nenhum cidade, então essa abordagem funciona */
+
+/* Exemplo 3: */
+> db.estados.update({sigla: "SP"}, {$push: {cidades: {nome: "Santos", populacao: 439898}}})
+/* no exemplo acima, considere que SP tem algumas cidades, ou seja, as cidades estão dentro de um array. Portanto, o $push é necessário */
+
+/* Exemplo 4: vai atualizar o atributo populacao do estado RJ */
+> db.estados.update({sigla: "RJ"}, {$set: {populacao: 16720000}})
+
+/* REMOVE */
+/* Exemplo: */
+> db.estados.remove({sigla: "AC"})
+
+/* Exemplo 2: vai excluir apenas 1 estado que possuir populacao */
+> db.estados.remove({populacao: {$exists: true}}, 1)
+
+/* Exemplo 3: vai excluir todos os estados que possuir menos que 20000000 de populacao */
+> db.estados.remove({populacao: {$lt: 20000000}})
+
+
+
+
+
+
