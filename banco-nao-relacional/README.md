@@ -181,7 +181,9 @@ Exemplo: para trazer o estado que tem a cidade Sorocaba */
 /* no exemplo acima, considere que SP tem algumas cidades, ou seja, as cidades estão dentro de um array. Portanto, o $push é necessário */
 
 /* Exemplo 4: vai atualizar o atributo populacao do estado RJ */
-> db.estados.update({sigla: "RJ"}, {$set: {populacao: 16720000}})msdfsdfsdf
+> db.estados.update({sigla: "RJ"}, {$set: {populacao: 16720000}})
+
+asdasds
 
 
 /* REMOVE */
