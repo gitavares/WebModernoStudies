@@ -183,8 +183,6 @@ Exemplo: para trazer o estado que tem a cidade Sorocaba */
 /* Exemplo 4: vai atualizar o atributo populacao do estado RJ */
 > db.estados.update({sigla: "RJ"}, {$set: {populacao: 16720000}})
 
-asdasds
-
 
 /* REMOVE */
 /* Exemplo: */
@@ -195,6 +193,37 @@ asdasds
 
 /* Exemplo 3: vai excluir todos os estados que possuir menos que 20000000 de populacao */
 > db.estados.remove({populacao: {$lt: 20000000}})
+
+/* LOOKUP */
+/* neste exemplo, serão inseridas duas empresas. Uma associando o estado e a outra associando uma cidade*/
+> db.empresas.insert({ nome: "Bradesco", estadoId: ObjectId("98230nn23420348")})
+> db.empresas.insert({ nome: "Vale", cidadeId: ObjectId("sd9d9s9d8d76sd6ds7ds8ds8")})
+// exemplo de LOOKUP com relacionamento com Estado
+> db.empresas.aggregate([
+    {$match: {nome: "Bradesco}},
+    {$lookup: {
+        from: "estados",
+        localField: "estadoId",
+        foreignField: "_id",
+        as: "estado"
+    }},
+    {$unwind: "estado"}
+]).pretty()
+// exemplo de LOOKUP com relacionamento com Cidade, mas trazendo o Estado dessa cidade
+> db.empresas.aggregate([
+    {$match: {vale: "Vale"}},
+    {$lookup: {
+        from: "estados",
+        localField: "cidadeId",
+        foreignField: "cidades._id",
+        as: "estado"
+    }},
+    {$unwind: "estado"},
+    {$unwind: "estado.cidades"},
+    {$addFields: { mesmaCidade: {$cmp: ["$estado.cidades._id", "$cidadeId"]}}},
+    {$match: {mesmaCidade: 0}}
+]).pretty()
+
 
 
 
